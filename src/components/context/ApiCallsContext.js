@@ -76,6 +76,8 @@ export default function ApiCallsProvider({ children }) {
           description: 'Payment for items in cart',
           logo: 'https://logos-world.net/wp-content/uploads/2020/11/Flipkart-Emblem.png',
         },
+        redirect_url: "http://localhost:3000/success",
+
       };
  
 
