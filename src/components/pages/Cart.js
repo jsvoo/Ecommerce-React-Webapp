@@ -5,6 +5,9 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useContext } from 'react'
 import { ApiCallsContext } from '../context/ApiCallsContext'
 import Navigation from '../Navigation'
+import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
+ 
+// import { handleFlutterPayment } from '../payments/FlutterwavePay'
 export default function Cart() {
 
     const Navigate = useNavigate()
@@ -21,7 +24,8 @@ export default function Cart() {
         loginBtn,
         setLoginBtn,
         logged_in,
-        setLoggedIn
+        setLoggedIn,
+        config
     } = useContext(ApiCallsContext)
 
     const today = new Date()
@@ -30,7 +34,7 @@ export default function Cart() {
 
     const deliveryDate = sevenDays.toDateString()
 
-
+    const handleFlutterPayment = useFlutterwave(config)
 
     const handleRemove = (index) => {
 
@@ -126,7 +130,17 @@ export default function Cart() {
 
 
                                 <div className='d-flex justify-content-end box-shadow p-3'>
-                                    <button className='place-order-btn'>PLACE ORDER</button>
+                                    <button className='place-order-btn'
+                                    onClick={()=>{
+                                        handleFlutterPayment({
+                                            callback: (response) => {
+                                                console.log(response);
+                                                //  closePaymentModal() // this will close the modal programmatically
+                                             },
+                                             onClose: () => {},
+                                        })
+                                    }}
+                                    >PLACE ORDER</button>
                                 </div>
 
                             </div>
