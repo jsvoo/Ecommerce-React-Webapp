@@ -24,6 +24,14 @@ export default function Cart() {
         setLoggedIn
     } = useContext(ApiCallsContext)
 
+    const today = new Date()
+    const sevenDays = new Date(today)
+    sevenDays.setDate(sevenDays.getDate() + 7)
+
+    const deliveryDate = sevenDays.toDateString()
+
+
+
     const handleRemove = (index) => {
 
         const thisItem = flipkart[index]
@@ -102,7 +110,7 @@ export default function Cart() {
 
                                                     </div>
                                                     <div className="delivery-date " style={{ width: '25%' }}>
-                                                        Delivery by Fri Oct 7 | Free
+                                                        Delivery by {deliveryDate} | Free
                                                     </div>
                                                 </div>
                                             )
@@ -156,17 +164,17 @@ export default function Cart() {
                     <>
                         <Navigation />
                         <div className='redirect-message fs-3 m-3'>
-                        <ToastContainer
-                            position="top-center"
-                            autoClose={5000}
-                            hideProgressBar={false}
-                            newestOnTop={false}
-                            closeOnClick
-                            rtl={false}
-                            pauseOnFocusLoss
-                            draggable
-                            pauseOnHover
-                        />
+                            <ToastContainer
+                                position="top-center"
+                                autoClose={5000}
+                                hideProgressBar={false}
+                                newestOnTop={false}
+                                closeOnClick
+                                rtl={false}
+                                pauseOnFocusLoss
+                                draggable
+                                pauseOnHover
+                            />
                             <button className='btn btn-primary text-primar fs-3' onClick={() => {
                                 setLoginBtn(true)
                                 console.log(loginBtn);
