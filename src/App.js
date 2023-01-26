@@ -10,8 +10,7 @@ import Product from './components/pages/Product';
 import Cart from './components/pages/Cart';
 import Login from './components/pages/Login';
 import ApiCallsProvider from './components/context/ApiCallsContext';
-import Admin from './components/pages/Admin';
-import DeenAdmin from './components/pages/DeenAdmin';
+import Admin from './components/pages/Admin'; 
 
 function App() {
   return (
@@ -31,8 +30,7 @@ function App() {
             <Route element={<Product />} path='/product/:id' />
             <Route element={<Cart />} path='/cart' />
             <Route element={<Login />} path='/login' />
-            <Route element={<Admin />} path='/admin' />
-            <Route element={<DeenAdmin />} path='/deenadmin' />
+            <Route element={<Admin />} path='/admin' /> 
 
           </Routes>
         </div>
