@@ -57,8 +57,27 @@ export default function ApiCallsProvider({ children }) {
     const [logged_in, setLoggedIn] = useState(
         localStorage.getItem('login_flipcart')
     )
-
-
+    const logged_in_user = JSON.parse(logged_in) 
+    //FOR PAYMENT GATEWAYS
+    // FLUTTERWAVE  
+    const config = {
+        public_key: 'FLWPUBK_TEST-4f4d4db722f2bb536da186ff2e4d678e-X',
+        tx_ref: Date.now()+1,
+        amount: total ,
+        currency: 'NGN',
+        payment_options: 'card,mobilemoney,ussd',
+        customer: {
+          email: logged_in_user.email,
+           phone_number: `${logged_in_user.phone}`,
+          name: logged_in_user.name,
+        },
+        customizations: {
+          title: 'Flipkart Pay',
+          description: 'Payment for items in cart',
+          logo: 'https://logos-world.net/wp-content/uploads/2020/11/Flipkart-Emblem.png',
+        },
+      };
+ 
 
     const exportData = {
         email,
@@ -114,7 +133,10 @@ export default function ApiCallsProvider({ children }) {
         logged_in,
         setLoggedIn,
         onMobile,
-        setOnMobile
+        setOnMobile,
+
+        //FLUTTERWAVE PAYMENT PARAMETERS
+        config
     }
     let a = Math.floor(Math.random() * 59)
     let b = Math.ceil(Math.random() * 88)
@@ -233,7 +255,7 @@ export default function ApiCallsProvider({ children }) {
                     error_msg('Login Failed...Wrong email or Password.')
                 } else if (data.name) {
                     success_msg('welcome ' + data.name)
-                    localStorage.setItem('login_flipcart', true)
+                    localStorage.setItem('login_flipcart', JSON.stringify(data))
                     setLoginBtn(false)
                     setLoggedIn(true)
 
