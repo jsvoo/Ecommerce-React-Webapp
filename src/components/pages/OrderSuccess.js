@@ -1,9 +1,18 @@
+import { useContext } from "react"
 import { useNavigate } from "react-router-dom"
+import { ApiCallsContext } from "../context/ApiCallsContext"
 
  
 export default function OrderSuccess (){
+    const {payStackRef} = useContext(ApiCallsContext)
     const navigate = useNavigate()
-    const tref = window.location.href.split("&")[1].split("=")[1]
+    const href = window.location.href
+    let tref =""
+    if(href.includes("&")){
+        tref=href.split("&")[1].split("=")[1]
+    }else{
+        tref = payStackRef
+    }
      return(
         <div className="successPage">
             <div className="image">

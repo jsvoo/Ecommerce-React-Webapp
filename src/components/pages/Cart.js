@@ -5,7 +5,11 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useContext } from 'react'
 import { ApiCallsContext } from '../context/ApiCallsContext'
 import Navigation from '../Navigation'
+
+//PAYMENT GATEWAYS
 import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
+import { usePaystackPayment } from 'react-paystack';
+
 
 // import { handleFlutterPayment } from '../payments/FlutterwavePay'
 export default function Cart() {
@@ -26,14 +30,15 @@ export default function Cart() {
         logged_in,
         setLoggedIn,
         logged_in_user,
-        setLogged_in_user
+        setLogged_in_user,
+        setPayStackRef
     } = useContext(ApiCallsContext)
 
-    useEffect(() => { 
+    useEffect(() => {
         if (!logged_in_user) {
             // navigate("/") 
             setLoginBtn(true)
-        } 
+        }
     }, [])
 
     //Setting Delivery Date to 7 days from today
@@ -41,32 +46,59 @@ export default function Cart() {
     const sevenDays = new Date(today)
     sevenDays.setDate(sevenDays.getDate() + 7)
 
-    const deliveryDate = sevenDays.toDateString() 
+    const deliveryDate = sevenDays.toDateString()
 
     //Flutterwave configuration
-    let config ={}
-  if(logged_in_user){
-     config = {
-        public_key: 'FLWPUBK_TEST-4f4d4db722f2bb536da186ff2e4d678e-X',
-        tx_ref: Date.now() + 1,
-        amount: total,
-        currency: 'NGN',
-        payment_options: 'card,mobilemoney,ussd',
-        customer: {
-            email: logged_in_user.email,
-            phone_number: `${logged_in_user.phone}`,
-            name: logged_in_user.name,
-        },
-        customizations: {
-            title: 'Flipkart Pay',
-            description: 'Payment for items in cart',
-            logo: 'https://logos-world.net/wp-content/uploads/2020/11/Flipkart-Emblem.png',
-        },
-        redirect_url: "http://localhost:3000/success",
+    let config = {}
+    if (logged_in_user) {
+        config = {
+            public_key: 'FLWPUBK_TEST-4f4d4db722f2bb536da186ff2e4d678e-X',
+            tx_ref: Date.now() + 1,
+            amount: total,
+            currency: 'NGN',
+            payment_options: 'card,mobilemoney,ussd',
+            customer: {
+                email: logged_in_user.email,
+                phone_number: `${logged_in_user.phone}`,
+                name: logged_in_user.name,
+            },
+            customizations: {
+                title: 'Flipkart Pay',
+                description: 'Payment for items in cart',
+                logo: 'https://logos-world.net/wp-content/uploads/2020/11/Flipkart-Emblem.png',
+            },
+            redirect_url: "http://localhost:3000/success",
 
+        };
+    }
+    const handleFlutterPayment = useFlutterwave(config)
+
+    //PAYSTACK CONFIGURATION
+    let payStackConfig = {}
+    if (logged_in_user) {
+        payStackConfig = {
+            reference: (new Date()).getTime().toString(),
+            email: logged_in_user.email,
+            amount: total *100, //Amount is in the country's lowest currency. E.g Kobo, so 20000 kobo = N200
+            publicKey: 'pk_test_e9ef54c88d345438266459a3011e0c468c47cb8b',
+        };
+    }
+
+
+    // you can call this function anything
+    const onSuccess = (reference) => {
+        // Implementation for whatever you want to do with reference and after success call.
+        console.log(reference);
+        setPayStackRef(reference.reference)
+        navigate(`/success`)
     };
-}
-const handleFlutterPayment = useFlutterwave(config)
+
+    // you can call this function anything
+    const onClose = () => {
+        // implementation for  whatever you want to do when the Paystack dialog closed.
+        console.log('closed')
+    }
+    const initializePayment = usePaystackPayment(payStackConfig)
 
 
     const handleRemove = (index) => {
@@ -162,7 +194,9 @@ const handleFlutterPayment = useFlutterwave(config)
 
 
 
-                                <div className='d-flex justify-content-end box-shadow p-3'>
+                               {
+                                kartItems && (
+                                    <div className='d-flex justify-content-end box-shadow p-3'>
                                     <button className='place-order-btn'
                                         onClick={() => {
                                             const localUser = localStorage.getItem("login_flipcart")
@@ -173,16 +207,28 @@ const handleFlutterPayment = useFlutterwave(config)
                                                 console.log(config)
                                                 handleFlutterPayment({
                                                     callback: (response) => {
-                                                        console.log(response);
-                                                        // localStorage.removeItem("flipkart")
-
+                                                        console.log(response); 
                                                         //  closePaymentModal() // this will close the modal programmatically
                                                     },
                                                 })
                                             }
                                         }}
                                     >Checkout with FlutterWave</button>
+                                     <button className='place-order-btn btn-primary bg-primary'
+                                        onClick={() => {
+                                            const localUser = localStorage.getItem("login_flipcart")
+                                            // console.log(localUser)
+                                            if (localUser) {
+                                                setLogged_in_user(JSON.parse(localUser))
+
+                                                console.log(config)
+                                                initializePayment(onSuccess, onClose)
+                                            }
+                                        }}
+                                    >Checkout with Paystack</button>
                                 </div>
+                                )
+                               }
 
                             </div>
 

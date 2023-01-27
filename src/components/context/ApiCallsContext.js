@@ -58,7 +58,7 @@ export default function ApiCallsProvider({ children }) {
         localStorage.getItem('login_flipcart')
     )
     const [logged_in_user, setLogged_in_user] = useState(JSON.parse(logged_in)) 
- 
+ const [payStackRef, setPayStackRef] = useState("")
  
     const exportData = {
         email,
@@ -119,7 +119,11 @@ export default function ApiCallsProvider({ children }) {
         //FLUTTERWAVE PAYMENT PARAMETERS
         // config,
         logged_in_user,
-        setLogged_in_user
+        setLogged_in_user,
+
+        //PAYSTACK
+        payStackRef,
+        setPayStackRef
     }
     let a = Math.floor(Math.random() * 59)
     let b = Math.ceil(Math.random() * 88)
