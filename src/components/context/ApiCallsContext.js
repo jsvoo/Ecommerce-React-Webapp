@@ -57,9 +57,9 @@ export default function ApiCallsProvider({ children }) {
     const [logged_in, setLoggedIn] = useState(
         localStorage.getItem('login_flipcart')
     )
-
-
-
+    const [logged_in_user, setLogged_in_user] = useState(JSON.parse(logged_in)) 
+ const [payStackRef, setPayStackRef] = useState("")
+ 
     const exportData = {
         email,
         setEmail,
@@ -114,7 +114,16 @@ export default function ApiCallsProvider({ children }) {
         logged_in,
         setLoggedIn,
         onMobile,
-        setOnMobile
+        setOnMobile,
+
+        //FLUTTERWAVE PAYMENT PARAMETERS
+        // config,
+        logged_in_user,
+        setLogged_in_user,
+
+        //PAYSTACK
+        payStackRef,
+        setPayStackRef
     }
     let a = Math.floor(Math.random() * 59)
     let b = Math.ceil(Math.random() * 88)
@@ -233,7 +242,8 @@ export default function ApiCallsProvider({ children }) {
                     error_msg('Login Failed...Wrong email or Password.')
                 } else if (data.name) {
                     success_msg('welcome ' + data.name)
-                    localStorage.setItem('login_flipcart', true)
+                    localStorage.setItem('login_flipcart', JSON.stringify(data))
+                    setLogged_in_user(data)
                     setLoginBtn(false)
                     setLoggedIn(true)
 

@@ -1145,6 +1145,31 @@ to{
 
 }
 
+.successPage{
+    text-align: center;
+    width: 50%;
+    margin: 20px auto;
+    h2{
+        color: #26A566;
+    }
+
+    .buttons{
+        width: 80%;
+        margin: auto;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    button:first-child{
+        @include buttonstyle(yellow, black )
+    }
+     button:last-child{
+        @include buttonstyle(#2874F0, white )
+    }
+}
+
 .mobile-nav {
     display: none;
     position: fixed;
