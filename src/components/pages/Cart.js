@@ -1,16 +1,16 @@
 import { IoInformationCircleSharp, IoShieldCheckmark } from 'react-icons/io5'
 import { useState } from 'react'
 import { useEffect } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useContext } from 'react'
 import { ApiCallsContext } from '../context/ApiCallsContext'
 import Navigation from '../Navigation'
 import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
- 
+
 // import { handleFlutterPayment } from '../payments/FlutterwavePay'
 export default function Cart() {
 
-    const Navigate = useNavigate()
+    const navigate = useNavigate()
     const {
         flipkart,
         setFlipKart,
@@ -25,16 +25,49 @@ export default function Cart() {
         setLoginBtn,
         logged_in,
         setLoggedIn,
-        config
+        logged_in_user,
+        setLogged_in_user
     } = useContext(ApiCallsContext)
 
+    useEffect(() => { 
+        if (!logged_in_user) {
+            // navigate("/") 
+            setLoginBtn(true)
+        } 
+    }, [])
+
+    //Setting Delivery Date to 7 days from today
     const today = new Date()
     const sevenDays = new Date(today)
     sevenDays.setDate(sevenDays.getDate() + 7)
 
-    const deliveryDate = sevenDays.toDateString()
+    const deliveryDate = sevenDays.toDateString() 
 
-    const handleFlutterPayment = useFlutterwave(config)
+    //Flutterwave configuration
+    let config ={}
+  if(logged_in_user){
+     config = {
+        public_key: 'FLWPUBK_TEST-4f4d4db722f2bb536da186ff2e4d678e-X',
+        tx_ref: Date.now() + 1,
+        amount: total,
+        currency: 'NGN',
+        payment_options: 'card,mobilemoney,ussd',
+        customer: {
+            email: logged_in_user.email,
+            phone_number: `${logged_in_user.phone}`,
+            name: logged_in_user.name,
+        },
+        customizations: {
+            title: 'Flipkart Pay',
+            description: 'Payment for items in cart',
+            logo: 'https://logos-world.net/wp-content/uploads/2020/11/Flipkart-Emblem.png',
+        },
+        redirect_url: "http://localhost:3000/success",
+
+    };
+}
+const handleFlutterPayment = useFlutterwave(config)
+
 
     const handleRemove = (index) => {
 
@@ -61,7 +94,7 @@ export default function Cart() {
 
         <div>
             {
-                logged_in ? (
+                logged_in_user ? (
                     <div className="cart-container">
                         <ToastContainer
                             position="top-center"
@@ -108,7 +141,7 @@ export default function Cart() {
                                                         <span><s>N28000</s> <span><b>{item.price}</b></span> <span className='green f14'> 39% off 3 offers applied <IoInformationCircleSharp className='f15' /> </span></span>
 
                                                         <div className='d-flex gp-4 mt-4 mobile-button'>
-                                                            <button><strong >SAVE FOR LATER</strong></button>
+                                                            <button className='me-2'><strong >SAVE FOR LATER</strong></button>
                                                             <button onClick={() => handleRemove(i)}><strong>REMOVE</strong></button>
                                                         </div>
 
@@ -131,16 +164,24 @@ export default function Cart() {
 
                                 <div className='d-flex justify-content-end box-shadow p-3'>
                                     <button className='place-order-btn'
-                                    onClick={()=>{
-                                        handleFlutterPayment({
-                                            callback: (response) => {
-                                                console.log(response);
-                                                //  closePaymentModal() // this will close the modal programmatically
-                                             },
-                                             onClose: () => {},
-                                        })
-                                    }}
-                                    >PLACE ORDER</button>
+                                        onClick={() => {
+                                            const localUser = localStorage.getItem("login_flipcart")
+                                            // console.log(localUser)
+                                            if (localUser) {
+                                                setLogged_in_user(JSON.parse(localUser))
+
+                                                console.log(config)
+                                                handleFlutterPayment({
+                                                    callback: (response) => {
+                                                        console.log(response);
+                                                        // localStorage.removeItem("flipkart")
+
+                                                        //  closePaymentModal() // this will close the modal programmatically
+                                                    },
+                                                })
+                                            }
+                                        }}
+                                    >Checkout with FlutterWave</button>
                                 </div>
 
                             </div>
